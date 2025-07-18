@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Manage Notes</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 40px 20px;
+      background: linear-gradient(to right, #ffecd2, #fcb69f);
+      color: #333;
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 2.5rem;
+      color: #444;
+      margin-bottom: 20px;
+      animation: fadeIn 1s ease;
+    }
+
+    form {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 600px;
+      margin: 0 auto 30px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      animation: slideUp 0.8s ease;
+    }
+
+    input, textarea {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 1rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    button {
+      background: #ff7e5f;
+      color: white;
+      border: none;
+      padding: 12px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+
+    button:hover {
+      background: #feb47b;
+      transform: scale(1.02);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+      background: #fff;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      animation: fadeIn 1s ease;
+    }
+
+    th, td {
+      padding: 16px;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background-color: #ffe0c3;
+      text-align: left;
+    }
+
+    .actions button {
+      background: #ff6f61;
+      margin-right: 8px;
+    }
+
+    .actions button:hover {
+      background: #ff9472;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <h2>Manage Chatbot Notes</h2>
+
+  <form id="note-form">
+    <input type="hidden" id="note-id">
+    <input type="text" id="question" placeholder="Enter question" required>
+    <textarea id="answer" placeholder="Enter answer" required></textarea>
+    <button type="submit">Save</button>
+  </form>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Question</th>
+        <th>Answer</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="notes-table"></tbody>
+  </table>
+
+  <script>
+    const form = document.getElementById('note-form');
+    const tableBody = document.getElementById('notes-table');
+
+    function fetchNotes() {
+      fetch('/api/notes')
+        .then(res => res.json())
+        .then(data => {
+          tableBody.innerHTML = '';
+          data.forEach(note => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${note.question}</td>
+              <td>${note.answer}</td>
+              <td class="actions">
+                <button class="edit-btn"
+                        data-id="${note.id}"
+                        data-question="${encodeURIComponent(note.question)}"
+                        data-answer="${encodeURIComponent(note.answer)}">
+                  Edit
+                </button>
+                <button onclick="deleteNote(${note.id})">Delete</button>
+              </td>`;
+            tableBody.appendChild(row);
+          });
+        });
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const id = document.getElementById('note-id').value;
+      const question = document.getElementById('question').value.trim();
+      const answer = document.getElementById('answer').value.trim();
+
+      const method = id ? 'PUT' : 'POST';
+      const url = id ? `/api/notes/${id}` : '/api/notes';
+
+      fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question, answer })
+      })
+      .then(async response => {
+        if (response.ok) {
+          form.reset();
+          fetchNotes();
+        } else if (response.status === 400) {
+          const data = await response.json();
+          alert(data.message || "This question already exists.");
+        } else {
+          alert("Something went wrong while saving.");
+        }
+      });
+    });
+
+    // Handle edit button click using event delegation
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('edit-btn')) {
+        const id = e.target.dataset.id;
+        const question = decodeURIComponent(e.target.dataset.question);
+        const answer = decodeURIComponent(e.target.dataset.answer);
+
+        document.getElementById('note-id').value = id;
+        document.getElementById('question').value = question;
+        document.getElementById('answer').value = answer;
+      }
+    });
+
+    function deleteNote(id) {
+      fetch(`/api/notes/${id}`, { method: 'DELETE' })
+        .then(() => fetchNotes());
+    }
+
+    fetchNotes();
+  </script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome - Your Future</title>
+  
+</head>
+<style>
+    * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #a18cd1, #fbc2eb);
+  background-size: 400% 400%;
+  animation: gradientBG 10s ease infinite;
+  color: white;
+  height: 100vh;
+  overflow: hidden;
+}
+
+@keyframes gradientBG {
+  0% {background-position: 0% 50%;}
+  50% {background-position: 100% 50%;}
+  100% {background-position: 0% 50%;}
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 60px;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.logo {
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  margin-left: 20px;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+nav a:hover {
+  color: #ffd700;
+}
+
+.hero {
+  text-align: center;
+  margin-top: 15%;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  animation: fadeIn 1.5s ease;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+  animation: fadeIn 2s ease;
+}
+
+.btn {
+  text-decoration: none;
+  padding: 12px 28px;
+  background-color: #fff;
+  color: #333;
+  font-weight: bold;
+  border-radius: 30px;
+  transition: all 0.4s ease;
+  animation: fadeIn 2.5s ease;
+}
+
+.btn:hover {
+  background-color: #ffd700;
+  color: black;
+  transform: scale(1.05);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+</style>
+<body>
+  <header>
+    <div class="logo">CampusCore</div>
+    <nav>
+      <a href="/signup">Sign Up</a>
+      <a href="/login">Login</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>Welcome to Your Future</h1>
+    <p>Step into a smarter world with CampusCore</p>
+    <a href="/signup" class="btn">Get Started ❤️</a>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
